@@ -1,26 +1,27 @@
-import {Link, useNavigate} from 'react-router-dom'
-import { supabase } from '../../supabaseClient'; 
+import {Link} from 'react-router-dom'
+import { supabase } from '../../supabaseClient';
 import {useEffect, useState} from 'react'
 
-const Login = () => {
+const SignUp = () => {
 
+  // save user typed text
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
 
+  // helper to track and show msgs to user
   const [loading, setLoading] = useState(false)
-  const [message, setMessage] = useState('')
-  
-  const navigate = useNavigate()
 
-  const handleLogin = async (e) => {
+  const [message, setMessage] = useState('')
+
+  // submission handling function
+
+  const handleSignUp = async (e) => {
     e.preventDefault()
     setLoading(true)
     setMessage('')
 
-    const cleanEmail = email.trim()
-
-    const {data, error} = await supabase.auth.signInWithPassword({
-      email: cleanEmail,
+    const {data, error} = await supabase.auth.signUp({
+      email: email,
       password: password,
     })
 
@@ -28,12 +29,9 @@ const Login = () => {
 
     if (error) {
       setMessage(`${error.message}`)
+    } else {
+      setMessage ('Account created Sucessfully!')
     }
-    else {
-      setMessage(`Sign in Successful!`)
-      navigate('/Dashboard')
-    }
-
   }
   return (
     <>
@@ -43,22 +41,20 @@ const Login = () => {
 
     <div className="container max-w-md p-6 bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl">
     
-
-        <form className='flex flex-col gap-4' action="" onSubmit={handleLogin}>
-          <h2 className='text-center text-xl font-bold text-white'>Login</h2>
+        <form className='flex flex-col gap-4' onSubmit={handleSignUp}>
+          <h2 className='text-center text-xl font-bold text-white'>Create Account</h2>
 
             {message &&
-
             <div className='p-3 text-sm text-center rounded-lg bg-slate-800 text-white border border-slate-700'>{message}</div>
             }
-            
+
             <label>Email</label>
             <input 
             value={email}
             className='w-full rounded-md border border-slate-700 bg-slate-900 p-3 text-white placeholder-slate-400 focus:border-blue-500 focus:outline-none' 
             type="email" 
             placeholder='Email Address'
-            onChange={(e)=> setEmail(e.target.value)}
+            onChange={(e) => setEmail(e.target.value)}
             />
 
             <label>Password</label>
@@ -74,16 +70,16 @@ const Login = () => {
             type="submit"
             className='w-full rounded-md bg-blue-600 p-3 font-semibold text-white hover:bg-blue-700 transition-all duration-300 hover:cursor-pointer'
             >
-              Login
+              Create Account
             </button>
 
             <p className='text-center text-sm text-late-400 mt-2'>
-              Don't have an account? {' '}
+              Already have an account? {' '}
             <Link
-            to='/SignUp'
+            to='/'
             className='font-medium text-blue-400 hover:text-blue-300 hover:underline transition-all'
             >
-            Sign up
+            Login
             </Link>
             </p>
         </form>
@@ -93,4 +89,4 @@ const Login = () => {
   )
 }
 
-export default Login
+export default SignUp
