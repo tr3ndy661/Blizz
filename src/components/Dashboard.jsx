@@ -6,7 +6,6 @@ const Dashboard = () => {
   const navigate = useNavigate()
   const [loading, setLoading] = useState(false)
   
-  // We'll store the profile data here in Ticket 5
   const [profile, setProfile] = useState(null)
 
   const handleLogout = async () => {
@@ -22,7 +21,7 @@ const Dashboard = () => {
 
   return (
     <div className="min-h-screen bg-slate-950 p-6 text-white">
-      {/* Top Navigation */}
+
       <nav className="mb-8 flex items-center justify-between rounded-2xl bg-white/5 p-4 backdrop-blur-xl border border-white/10">
         <h1 className="text-xl font-bold tracking-wider text-blue-400">Blizz</h1>
         <button 
@@ -34,13 +33,11 @@ const Dashboard = () => {
         </button>
       </nav>
 
-      {/* Main Bento Grid */}
       <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
         
-        {/* Left Column: Profile Card (Ticket 4) */}
         <div className="col-span-1 rounded-3xl bg-white/5 p-6 backdrop-blur-xl border border-white/10">
           <div className="flex flex-col items-center gap-4 text-center">
-            {/* Placeholder Avatar */}
+
             <div className="h-24 w-24 rounded-full bg-slate-800 border-2 border-blue-500"></div>
             
             <div>
@@ -54,7 +51,6 @@ const Dashboard = () => {
           </div>
         </div>
 
-        {/* Right Column: Library / Stats (Future Sprints) */}
         <div className="col-span-1 md:col-span-2 rounded-3xl bg-white/5 p-6 backdrop-blur-xl border border-white/10">
           <h2 className="mb-4 text-xl font-bold">My Library</h2>
           <p className="text-slate-400">No series tracked yet.</p>
