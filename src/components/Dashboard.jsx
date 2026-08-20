@@ -7,17 +7,49 @@ const Dashboard = () => {
   const [loading, setLoading] = useState(false)
   
   const [profile, setProfile] = useState(null)
+  const [fetchingProfile, setFetchingProfile] = useState(true)
 
+
+    useEffect (() => {
+        const getProfile = async () => {
+            try {
+                setFetchingProfile(true)
+                const {data: {user}, error: authError} = await supabase.auth.getUser()
+
+                if (authError || !user) {
+                    console.log ('No authenticated user found')
+                    navigate('/')
+                    return
+                } 
+                
+                const { data, error } = await supabase.from('profiles').select('*').eq('id', user.id).single()
+
+                if (error) {
+                    throw error  
+                }
+
+                setProfile(data)
+            } catch (error){
+                console.log(`Eror getting profile from database: ${error.message}`)
+            } finally {
+                setFetchingProfile (false)
+            }
+        }
+        getProfile()
+    }, [navigate])
+  
   const handleLogout = async () => {
-    setLoading(true)
-    const { error } = await supabase.auth.signOut()
-    setLoading(false)
-    if (error) {
-      alert(`Log out failed: ${error.message}`)
-    } else {
-      navigate('/')
+      setLoading(true)
+      const { error } = await supabase.auth.signOut()
+      setLoading(false)
+      if (error) {
+          alert(`Log out failed: ${error.message}`)
+        } else {
+            navigate('/')
+        }
     }
-  }
+    
+
 
   return (
     <div className="min-h-screen bg-slate-950 p-6 text-white">
@@ -41,7 +73,7 @@ const Dashboard = () => {
             <div className="h-24 w-24 rounded-full bg-slate-800 border-2 border-blue-500"></div>
             
             <div>
-              <h2 className="text-2xl font-bold">Username</h2>
+              <h2 className="text-2xl font-bold">{profile?.username}</h2>
               <p className="mt-2 text-sm text-slate-400">User bio is supposed to go here.</p>
             </div>
             

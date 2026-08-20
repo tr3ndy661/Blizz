@@ -7,7 +7,7 @@ const SignUp = () => {
   // save user typed text
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
-
+  const [name, setName] = useState('')
   // helper to track and show msgs to user
   const [loading, setLoading] = useState(false)
 
@@ -21,8 +21,14 @@ const SignUp = () => {
     setMessage('')
 
     const {data, error} = await supabase.auth.signUp({
+      name: name,
       email: email,
       password: password,
+      options: {
+        data: {
+          user_name: name,
+        }
+      }
     })
 
     setLoading(false)
@@ -47,6 +53,16 @@ const SignUp = () => {
             {message &&
             <div className='p-3 text-sm text-center rounded-lg bg-slate-800 text-white border border-slate-700'>{message}</div>
             }
+
+            <label>Username</label>
+            <input 
+            value={name}
+            className='w-full rounded-md border border-slate-700 bg-slate-900 p-3 text-white placeholder-slate-400 focus:border-blue-500 focus:outline-none' 
+            type="text" 
+            placeholder='Username'
+            onChange={(e) => setName(e.target.value)}
+            />
+
 
             <label>Email</label>
             <input 
