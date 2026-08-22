@@ -21,7 +21,6 @@ const SignUp = () => {
     setMessage('')
 
     const {data, error} = await supabase.auth.signUp({
-      name: name,
       email: email,
       password: password,
       options: {

@@ -74,7 +74,7 @@ const Dashboard = () => {
             
             <div>
               <h2 className="text-2xl font-bold">{profile?.username}</h2>
-              <p className="mt-2 text-sm text-slate-400">User bio is supposed to go here.</p>
+              <p className="mt-2 text-sm text-slate-400">{fetchingProfile ? 'Loading...' : profile?.bio || 'User bio is supposed to go here.'}</p>
             </div>
             
             <button className="mt-4 w-full rounded-xs border border-slate-700 bg-slate-900 p-2 text-sm font-semibold text-white transition-all hover:border-blue-500 hover:cursor-pointer">
