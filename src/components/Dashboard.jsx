@@ -10,6 +10,41 @@ const Dashboard = () => {
   const [fetchingProfile, setFetchingProfile] = useState(true)
 
 
+//   use states for the bio
+  const [editing, setIsEditing] = useState (false)
+  const [editUsername, setEditUsername] = useState('')
+  const [editBio, setEditBio] = useState('')
+
+//   handeling profile update
+  const updateProfile = async (e) => {
+    e.preventDefault()
+    setLoading(true)
+
+    try {
+        const { data: { user } } = await supabase.auth.getUser()
+
+        const updates = {
+            id: user.id,
+            username: editUsername,
+            bio: editBio,
+        }
+
+        const {error} = await supabase.from('profiles').upsert(updates)
+
+        if (error) {
+            alert(error.message)
+        }
+        else {
+            setProfile(updates)
+              setIsEditing(false)
+        } 
+    }catch (error) {
+        alert ('data not update an error occured!')
+    } finally {
+        setLoading (false)
+  }
+  }
+
     useEffect (() => {
         const getProfile = async () => {
             try {
@@ -37,7 +72,11 @@ const Dashboard = () => {
         }
         getProfile()
     }, [navigate])
-  
+
+
+
+
+
   const handleLogout = async () => {
       setLoading(true)
       const { error } = await supabase.auth.signOut()
@@ -76,10 +115,56 @@ const Dashboard = () => {
               <h2 className="text-2xl font-bold">{profile?.username}</h2>
               <p className="mt-2 text-sm text-slate-400">{fetchingProfile ? 'Loading...' : profile?.bio || 'User bio is supposed to go here.'}</p>
             </div>
-            
-            <button className="mt-4 w-full rounded-xs border border-slate-700 bg-slate-900 p-2 text-sm font-semibold text-white transition-all hover:border-blue-500 hover:cursor-pointer">
-              Edit Profile
+
+            { editing ? (
+            <form onSubmit={updateProfile} className="flex w-full flex-col gap-3 text-left">
+                <label className="text-sm text-slate-400">Username</label>
+                <input 
+                type="text" 
+                value={editUsername}
+                onChange={(e) => setEditUsername(e.target.value)}
+                className="rounded-md border border-slate-700 bg-slate-900 p-2 text-white focus:border-blue-500 focus:outline-none"
+                />
+                
+                <label className="text-sm text-slate-400">Bio</label>
+                <textarea 
+                value={editBio}
+                onChange={(e) => setEditBio(e.target.value)}
+                className="rounded-md border border-slate-700 bg-slate-900 p-2 text-white focus:border-blue-500 focus:outline-none"
+                />
+                
+                <div className="flex gap-2">
+                <button 
+                    type="submit" 
+                    disabled={loading}
+                    className="mt-2 w-full rounded-md bg-blue-600 p-2 text-sm font-semibold text-white transition-all hover:bg-blue-700"
+                >
+                    {loading ? 'Saving...' : 'Save'}
+                </button>
+                <button 
+                    type="button" 
+                    onClick={() => setIsEditing(false)}
+                    className="mt-2 w-full rounded-md border border-slate-700 bg-transparent p-2 text-sm font-semibold text-white transition-all hover:bg-slate-800"
+                >
+                    Cancel
+                </button>
+                </div>
+            </form>
+            ) : (
+            <button 
+                className="mt-4 w-full rounded-xs border border-slate-700 bg-slate-900 p-2 text-sm font-semibold text-white transition-all hover:border-blue-500 hover:cursor-pointer"
+                onClick={() => {
+                // Pre-fill the form with the current data before opening it
+                setEditUsername(profile?.username || '')
+                setEditBio(profile?.bio || '')
+                setIsEditing(true)
+                }}
+            >
+                Edit Profile
             </button>
+            )}
+
+
           </div>
         </div>
 
