@@ -170,7 +170,13 @@ const Dashboard = () => {
 
         <div className="col-span-1 md:col-span-2 rounded-xs bg-white/5 p-6 backdrop-blur-xl border border-white/10">
           <h2 className="mb-4 text-xl font-bold">My Library</h2>
+
+
           <p className="text-slate-400">No series tracked yet.</p>
+          <br />
+        <button
+        className='rounded-xs bg-white/10 px-4 py-2 text-sm font-semibold text-white transition-all duration-300 hover:bg-blue-500 hover:cursor-pointer flex '
+        >Add New +</button>
         </div>
 
       </div>
