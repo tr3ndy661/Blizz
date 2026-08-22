@@ -1,6 +1,7 @@
 import { useNavigate } from 'react-router-dom'
 import { supabase } from '../supabaseClient';
-import { useState, useEffect } from 'react'
+import { useState, useEffect, use } from 'react'
+import AddMediaForm from './AddMediaForm';
 
 const Dashboard = () => {
   const navigate = useNavigate()
@@ -14,6 +15,33 @@ const Dashboard = () => {
   const [editing, setIsEditing] = useState (false)
   const [editUsername, setEditUsername] = useState('')
   const [editBio, setEditBio] = useState('')
+
+//   handeling the display of the AddForm
+
+  const [showAddForm, setShowAddForm] = useState(false)
+
+//   usestates for library
+  const [library,setLibrary] = useState ([])
+
+  const fetchLibrary = async () => {
+  const { data: { user } } = await supabase.auth.getUser();
+    if (!user) {
+        return
+    }
+
+    const {data, error} = await supabase
+    .from('library')
+    .select('*')
+    .eq('user_id', user.id)
+    .order('created_at', {ascending: false})
+
+    if (!error && data) {
+        setLibrary(data)
+    }
+}
+  useEffect (() => {
+      fetchLibrary()
+    }, [])
 
 //   handeling profile update
   const updateProfile = async (e) => {
@@ -172,11 +200,47 @@ const Dashboard = () => {
           <h2 className="mb-4 text-xl font-bold">My Library</h2>
 
 
-          <p className="text-slate-400">No series tracked yet.</p>
+        <div className="flex flex-col gap-3">
+        {library.length === 0 ? (
+            <p className="text-slate-400">No series tracked yet.</p>
+        ) : (
+            library.map((item) => (
+            <div 
+                key={item.id} 
+                className="flex items-center justify-between rounded-xl bg-slate-900/50 p-4 border border-slate-800"
+            >
+                <div>
+                <h3 className="font-bold text-white">{item.title}</h3>
+                <p className="text-xs text-slate-400 uppercase tracking-wider">
+                    {item.media_type} • {item.status}
+                </p>
+                </div>
+                
+                <div className="flex items-center gap-4 text-sm">
+                <div className="flex flex-col items-end">
+                    <span className="text-slate-500">Progress</span>
+                    <span className="font-semibold text-blue-400">{item.progress}</span>
+                </div>
+                <div className="flex flex-col items-end">
+                    <span className="text-slate-500">Rating</span>
+                    <span className="font-semibold text-yellow-500">{item.rating}/10</span>
+                </div>
+                </div>
+            </div>
+            ))
+        )}
+        </div>
+
           <br />
         <button
         className='rounded-xs bg-white/10 px-4 py-2 text-sm font-semibold text-white transition-all duration-300 hover:bg-blue-500 hover:cursor-pointer flex '
+        onClick={() => {
+            setShowAddForm(true)
+        }}
         >Add New +</button>
+        {showAddForm && (
+            <AddMediaForm onClose={() => setShowAddForm(false)} fetchLibrary={fetchLibrary}/>
+        )}
         </div>
 
       </div>
