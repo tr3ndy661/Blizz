@@ -23,6 +23,49 @@ const Dashboard = () => {
 //   usestates for library
   const [library,setLibrary] = useState ([])
 
+  const [uploading, setUploading] = useState(false)
+
+
+  const uploadAvatar = async () => {
+    try {
+        setUploading(true)
+
+        const file = event.target.files[0]
+        if (!file) return
+
+const fileExt = file.name.split('.').pop()
+      const fileName = `${Math.random()}.${fileExt}`
+      const filePath = `${fileName}`
+      const { error: uploadError } = await supabase.storage
+        .from('avatars')
+        .upload(filePath, file)
+
+      if (uploadError) throw uploadError
+
+      const { data } = supabase.storage
+        .from('avatars')
+        .getPublicUrl(filePath)
+      
+      const newAvatarUrl = data.publicUrl
+
+      const { data: { user } } = await supabase.auth.getUser()
+      
+      const { error: updateError } = await supabase
+        .from('profiles')
+        .update({ avatar_url: newAvatarUrl })
+        .eq('id', user.id)
+
+      if (updateError) throw updateError
+
+    setProfile({ ...profile, avatar_url: newAvatarUrl })
+
+    } catch (error) {
+      alert(`Error uploading avatar: ${error.message}`)
+    } finally {
+      setUploading(false)
+    }
+  }
+
   const fetchLibrary = async () => {
   const { data: { user } } = await supabase.auth.getUser();
     if (!user) {
@@ -137,8 +180,29 @@ const Dashboard = () => {
         <div className="col-span-1 rounded-xs bg-white/5 p-6 backdrop-blur-xl border border-white/10">
           <div className="flex flex-col items-center gap-4 text-center">
 
+        <div className="flex flex-col items-center gap-2">
+        {profile?.avatar_url ? (
+            <img 
+            src={profile.avatar_url} 
+            alt="Avatar" 
+            className="h-24 w-24 rounded-full border-2 border-blue-500 object-cover shadow-lg shadow-blue-500/20"
+            />
+        ) : (
             <div className="h-24 w-24 rounded-full bg-slate-800 border-2 border-blue-500"></div>
-            
+        )}
+        
+        <label className="cursor-pointer text-xs font-semibold text-blue-400 transition-colors hover:text-blue-300">
+            {uploading ? 'Uploading...' : 'Upload Image'}
+            {/* The actual file input is hidden by Tailwind, but clicking the label triggers it! */}
+            <input
+            type="file"
+            accept="image/*"
+            className="hidden"
+            onChange={uploadAvatar}
+            disabled={uploading}
+            />
+        </label>
+        </div>            
             <div>
               <h2 className="text-2xl font-bold">{profile?.username}</h2>
               <p className="mt-2 text-sm text-slate-400">{fetchingProfile ? 'Loading...' : profile?.bio || 'User bio is supposed to go here.'}</p>
